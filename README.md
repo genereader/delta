@@ -3,9 +3,13 @@ a Distal Enhancer Locating Tool based on AdaBoost and shape features of chromati
 
 ## Options
   --version             show program's version number and exit
+
   -h, --help            show this help message and exit
+
   -c CHIP_BEDS, --chip_bed=CHIP_BEDS
+
                         ChIP-seq bed file of histone modifications
+
   -R, --read            Read existing training and predicting data instead of
                         generate from ChIP-seq (default: False)
   -E ENHANCER, --enhancer=ENHANCER
