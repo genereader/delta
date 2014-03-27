@@ -8,13 +8,14 @@ In the post-genomic era, accurate functional annotation of genomic sequences, es
 Please check the file 'INSTALL' in the distribution.
 
 ## Usage
-	Usage: macs14 <-t tfile> [-n name] [-g genomesize] [options]
-	Example: macs14 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+	Usage: delta.py [-c chip_files] [-P promoter_loci] [-E enhancer_loci] [options]
+
+	Example: delta.py -c H3K4me1.bed,H3K4me3.bed,H3K27ac.bed -E p300.bed -P tss.bed -g hg19
 
 	--version
-										show program's version number and exit
+										Show program's version number and exit
 	-h, --help
-										show this help message and exit
+										Show this help message and exit
 	-c CHIP_BEDS, --chip_bed=CHIP_BEDS
 										ChIP-seq bed file of histone modifications
 	-R, --read
@@ -44,5 +45,6 @@ Please check the file 'INSTALL' in the distribution.
 										Output file name (default output file is 
 										"predicted_enhancer.bed")
 ## Parameters
-
+-c / --chip_bed
+ChIP-seq files contain chromatin modifications mapping data. User should provide ChIP-seq files separated by comma, e.g. H3K4me1.bed,H3K4me3.bed,H3K27ac.bed.
 ## Notes
