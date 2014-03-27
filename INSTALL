@@ -1,0 +1,34 @@
+INSTALL Guide For DELTA
+
+Please check the following instructions to complete your installation.
+
+*** Prerequisite
+
+I. Install bedtools.
+Bedtools is a flexible suite of utilities for comparing genomic features and is required by DETLA. It can be downloaded from https://code.google.com/p/bedtools/ or https://github.com/arq5x/bedtools2.
+
+II. Install python required packages.
+Install the numpy, scipy packages (http://www.scipy.org/) and pybedtools package (http://github.com/daler/pybedtools). To check whether the packages are properly installed, please run:
+
+$ python
+>>> import numpy
+>>> import scipy
+>>> import pybedtools
+
+III. Install R required packages.
+Install the 'ada' package. To check whether the packages are properly installed, please run:
+
+$ R
+>>> library(ada)
+
+*** Install under Linux or Mac OS
+
+To install DETLA, unpack the distribution zip and open up a command terminal. Go to the directory where you unpacked DETLA, and simply type this in the commend line:
+
+$ chmod +x delta.py
+
+After running the command, you might need to add the install location to your PATH environment variables to use delta.py command everywhere. 
+
+--
+Yiming Lu <ylu.phd@gmail.com>
+
