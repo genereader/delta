@@ -1,14 +1,25 @@
 # DELTA
 a Distal Enhancer Locating Tool based on AdaBoost and shape features of chromatin modifications
 
-## Options
-  --version             show program's version number and exit
+## Introduction
+In the post-genomic era, accurate functional annotation of genomic sequences, especially DNA regulatory elements, has become an urgent need to understand of the complex mechanisms of human genome. Recent large-scale chromatin states mapping efforts revealed characteristic chromatin modification signatures for various types of functional DNA elements, promoting the emergence of a series of supervised and unsupervised-based methods for DNA elements prediction. However, these methods suffered from two major issues: (1) incomplete feature extraction of chromatin signatures and (2) inconsistency of histone modification importance between cell types. Here, we address these issues by introducing three important shape parameters of chromatin modifications from probability theory. We developed a novel method DELTA (a Distal Enhancer Locating Tool based on AdaBoost and shape features of chromatin modifications). We not only show that DELTA outperformed previous methods in different datasets, but also find that histone modification importance for enhancer prediction in different cell types are highly correlated. In summary, our results give insight into the consistency of variable importance of chromatin modifications across cell types and provide an accurate tool for enhancer prediction based on chromatin signatures.
 
-  -h, --help            show this help message and exit
+## Install
+Please check the file 'INSTALL' in the distribution.
 
-  -c CHIP_BEDS, --chip_bed=CHIP_BEDS
+## Usage
+Usage: macs14 <-t tfile> [-n name] [-g genomesize] [options]
+Example: macs14 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 
-                        ChIP-seq bed file of histone modifications
+		--version
+										show program's version number and exit
+
+		-h, --help
+										show this help message and exit
+
+		-c CHIP_BEDS, --chip_bed=CHIP_BEDS
+
+										ChIP-seq bed file of histone modifications
 
   -R, --read            Read existing training and predicting data instead of
                         generate from ChIP-seq (default: False)
@@ -35,3 +46,6 @@ a Distal Enhancer Locating Tool based on AdaBoost and shape features of chromati
   -o OUTPUT, --output=OUTPUT
                         Output file name (default output file is
                         "predicted_enhancer.bed")
+## Parameters
+
+## Notes
