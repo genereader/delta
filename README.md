@@ -8,28 +8,23 @@ In the post-genomic era, accurate functional annotation of genomic sequences, es
 Please check the file 'INSTALL' in the distribution.
 
 ## Usage
-Usage: macs14 <-t tfile> [-n name] [-g genomesize] [options]
-Example: macs14 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+	Usage: macs14 <-t tfile> [-n name] [-g genomesize] [options]
+	Example: macs14 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 
-		--version
+	--version
 										show program's version number and exit
-
-		-h, --help
+	-h, --help
 										show this help message and exit
-
-		-c CHIP_BEDS, --chip_bed=CHIP_BEDS
-
+	-c CHIP_BEDS, --chip_bed=CHIP_BEDS
 										ChIP-seq bed file of histone modifications
-
-  -R, --read            Read existing training and predicting data instead of
-                        generate from ChIP-seq (default: False)
+  -R, --read
+                    Read existing training and predicting data instead of generate from ChIP-seq (default: False)
   -E ENHANCER, --enhancer=ENHANCER
-                        BED file containing the enhancer loci
+                    BED file containing the enhancer loci
   -P PROMOTER, --promoter=PROMOTER
-                        BED file containing the promoter loci
+                    BED file containing the promoter loci
   -g GENOME, --genome=GENOME
-                        Genome assembly should be one of the followings: dm3,
-                        mm9, hg17, hg18, hg19
+                    Genome assembly should be one of the followings: dm3, mm9, hg17, hg18, hg19
   -b BIN_SIZE, --bin_size=BIN_SIZE
                         Length of dividing bins (default: 100)
   -s STEP_SIZE, --step=STEP_SIZE
