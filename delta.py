@@ -216,6 +216,9 @@ def main():
 	print >> rscript, 'adapred <- predict(adamodel, newdata=pdata,type="probs")'
 	print >> rscript, 'write.table(adapred[,2],"pred",quote=F,row.names=F,col.names=F)'
 	rscript.close()
+
+	print '@ ' + time.ctime(),
+	print 'Model training and predicting.'
 	
 	# Execution of AdaBoost
 	p = subprocess.Popen('Rscript adaboost.R', shell=True)
