@@ -77,77 +77,78 @@ def main():
 			dictChip2Len[chipName] = len(open(chipName).readlines())
 
 		# Train data
-		trainData = []
-		enhancerBed = loci2bed(options.enhancer, 'enhancer', options.bin_size, options.win_size, tmp_dir)
-		promoterBed = loci2bed(options.promoter, 'promoter', options.bin_size, options.win_size, tmp_dir)
-		sampleSize = options.back_size
-		shuffledBedName = shuffle_window(options.promoter, options.enhancer, sampleSize, options.win_size, options.genome, real_dir, tmp_dir)
-		shuffledBed = loci2bed(shuffledBedName, 'shuffled', options.bin_size, options.win_size, tmp_dir)
+		if options.enhancer != 'NA':
+			trainData = []
+			enhancerBed = loci2bed(options.enhancer, 'enhancer', options.bin_size, options.win_size, tmp_dir)
+			promoterBed = loci2bed(options.promoter, 'promoter', options.bin_size, options.win_size, tmp_dir)
+			sampleSize = options.back_size
+			shuffledBedName = shuffle_window(options.promoter, options.enhancer, sampleSize, options.win_size, options.genome, real_dir, tmp_dir)
+			shuffledBed = loci2bed(shuffledBedName, 'shuffled', options.bin_size, options.win_size, tmp_dir)
 
-		for chipName in chipNames:
-			print '@ ' + time.ctime(),
-			print 'Calculating coverage of ' + chipName + ' at training targets and background region.'
-			# Loading ChIP-seq BED file
-			chipBed = BedTool(chipName)
-			# Line count of ChIP-seq for normalization
-			lineCount = dictChip2Len[chipName]
-			# Enhancer
-			# Count calculation
-			BedTool(enhancerBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'enhancer_count.bed'))
-			enhancerProfileMat = profile_target(os.path.join(tmp_dir,'enhancer_count.bed'), os.path.join(tmp_dir,'enhancer_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
-			# Calculate target position for each modification and add to position matrix
-			enhancerTargetPosList = [win/2]*len(enhancerProfileMat)
-			# Smooth profiles
-			enhancerProfileMat = smooth_mat(enhancerProfileMat)
-			# Calculate parameters
-			enhancerFeatureKurt, enhancerFeatureSkew, enhancerFeatureBimo, enhancerFeatureItst = shape(enhancerProfileMat, enhancerTargetPosList, win)
+			for chipName in chipNames:
+				print '@ ' + time.ctime(),
+				print 'Calculating coverage of ' + chipName + ' at training targets and background region.'
+				# Loading ChIP-seq BED file
+				chipBed = BedTool(chipName)
+				# Line count of ChIP-seq for normalization
+				lineCount = dictChip2Len[chipName]
+				# Enhancer
+				# Count calculation
+				BedTool(enhancerBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'enhancer_count.bed'))
+				enhancerProfileMat = profile_target(os.path.join(tmp_dir,'enhancer_count.bed'), os.path.join(tmp_dir,'enhancer_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
+				# Calculate target position for each modification and add to position matrix
+				enhancerTargetPosList = [win/2]*len(enhancerProfileMat)
+				# Smooth profiles
+				enhancerProfileMat = smooth_mat(enhancerProfileMat)
+				# Calculate parameters
+				enhancerFeatureKurt, enhancerFeatureSkew, enhancerFeatureBimo, enhancerFeatureItst = shape(enhancerProfileMat, enhancerTargetPosList, win)
 
-			# Promoter
-			# Count calculation
-			BedTool(promoterBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'promoter_count.bed'))
-			promoterProfileMat = profile_target(os.path.join(tmp_dir,'promoter_count.bed'), os.path.join(tmp_dir,'promoter_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
-			# Calculate target position for each modification and add to position matrix
-			promoterTargetPosList = [win/2]*len(promoterProfileMat)
-			# Smooth profiles
-			promoterProfileMat = smooth_mat(promoterProfileMat)
-			# Calculate parameters
-			promoterFeatureKurt, promoterFeatureSkew, promoterFeatureBimo, promoterFeatureItst = shape(promoterProfileMat, promoterTargetPosList, win)
+				# Promoter
+				# Count calculation
+				BedTool(promoterBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'promoter_count.bed'))
+				promoterProfileMat = profile_target(os.path.join(tmp_dir,'promoter_count.bed'), os.path.join(tmp_dir,'promoter_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
+				# Calculate target position for each modification and add to position matrix
+				promoterTargetPosList = [win/2]*len(promoterProfileMat)
+				# Smooth profiles
+				promoterProfileMat = smooth_mat(promoterProfileMat)
+				# Calculate parameters
+				promoterFeatureKurt, promoterFeatureSkew, promoterFeatureBimo, promoterFeatureItst = shape(promoterProfileMat, promoterTargetPosList, win)
 
-			# Background window
-			# Coverage calculation
-			BedTool(shuffledBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'shuffled_count.bed'))
-			shuffledProfileMat = profile_target(os.path.join(tmp_dir,'shuffled_count.bed'), os.path.join(tmp_dir,'shuffled_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
-			# Calculate target position for each modification and add to position matrix
-			shuffledTargetPosList = [win/2]*len(shuffledProfileMat)
-			# Smooth profiles
-			shuffledProfileMat = smooth_mat(shuffledProfileMat)
-			# Calculate parameters
-			shuffledFeatureKurt, shuffledFeatureSkew, shuffledFeatureBimo, shuffledFeatureItst = shape(shuffledProfileMat, shuffledTargetPosList, win)
+				# Background window
+				# Coverage calculation
+				BedTool(shuffledBed).window(chipBed,w=0,c=True,output=os.path.join(tmp_dir,'shuffled_count.bed'))
+				shuffledProfileMat = profile_target(os.path.join(tmp_dir,'shuffled_count.bed'), os.path.join(tmp_dir,'shuffled_temp_bin.bed'), lineCount, options.bin_size, options.win_size)
+				# Calculate target position for each modification and add to position matrix
+				shuffledTargetPosList = [win/2]*len(shuffledProfileMat)
+				# Smooth profiles
+				shuffledProfileMat = smooth_mat(shuffledProfileMat)
+				# Calculate parameters
+				shuffledFeatureKurt, shuffledFeatureSkew, shuffledFeatureBimo, shuffledFeatureItst = shape(shuffledProfileMat, shuffledTargetPosList, win)
 
-			if len(trainData) == 0:
-				for i in range(0, len(enhancerProfileMat)):
-					trainData.append(['1',enhancerFeatureItst[i],enhancerFeatureKurt[i],enhancerFeatureSkew[i],enhancerFeatureBimo[i]])
-				for i in range(0, len(promoterProfileMat)):
-					trainData.append(['0',promoterFeatureItst[i],promoterFeatureKurt[i],promoterFeatureSkew[i],promoterFeatureBimo[i]])
-				for i in range(0, len(shuffledProfileMat)):
-					trainData.append(['0',shuffledFeatureItst[i],shuffledFeatureKurt[i],shuffledFeatureSkew[i],shuffledFeatureBimo[i]])
-			else:
-				for i in range(0, len(enhancerProfileMat)):
-					trainData[i].append(enhancerFeatureItst[i])
-					trainData[i].append(enhancerFeatureKurt[i])
-					trainData[i].append(enhancerFeatureSkew[i])
-					trainData[i].append(enhancerFeatureBimo[i])
-				for i in range(0, len(promoterProfileMat)):
-					trainData[len(enhancerProfileMat)+i].append(promoterFeatureItst[i])
-					trainData[len(enhancerProfileMat)+i].append(promoterFeatureKurt[i])
-					trainData[len(enhancerProfileMat)+i].append(promoterFeatureSkew[i])
-					trainData[len(enhancerProfileMat)+i].append(promoterFeatureBimo[i])
-				for i in range(0, len(shuffledProfileMat)):
-					trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureItst[i])
-					trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureKurt[i])
-					trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureSkew[i])
-					trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureBimo[i])
-		write_plain_format(trainData, 'trainData.txt')
+				if len(trainData) == 0:
+					for i in range(0, len(enhancerProfileMat)):
+						trainData.append(['1',enhancerFeatureItst[i],enhancerFeatureKurt[i],enhancerFeatureSkew[i],enhancerFeatureBimo[i]])
+					for i in range(0, len(promoterProfileMat)):
+						trainData.append(['0',promoterFeatureItst[i],promoterFeatureKurt[i],promoterFeatureSkew[i],promoterFeatureBimo[i]])
+					for i in range(0, len(shuffledProfileMat)):
+						trainData.append(['0',shuffledFeatureItst[i],shuffledFeatureKurt[i],shuffledFeatureSkew[i],shuffledFeatureBimo[i]])
+				else:
+					for i in range(0, len(enhancerProfileMat)):
+						trainData[i].append(enhancerFeatureItst[i])
+						trainData[i].append(enhancerFeatureKurt[i])
+						trainData[i].append(enhancerFeatureSkew[i])
+						trainData[i].append(enhancerFeatureBimo[i])
+					for i in range(0, len(promoterProfileMat)):
+						trainData[len(enhancerProfileMat)+i].append(promoterFeatureItst[i])
+						trainData[len(enhancerProfileMat)+i].append(promoterFeatureKurt[i])
+						trainData[len(enhancerProfileMat)+i].append(promoterFeatureSkew[i])
+						trainData[len(enhancerProfileMat)+i].append(promoterFeatureBimo[i])
+					for i in range(0, len(shuffledProfileMat)):
+						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureItst[i])
+						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureKurt[i])
+						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureSkew[i])
+						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureBimo[i])
+			write_plain_format(trainData, 'trainData.txt')
 
 		# Predict data
 		# Binning genome
@@ -205,37 +206,38 @@ def main():
 		outfileTarget.close()
 		write_plain_format(predictData, 'predictData.txt')
 
-	# Creat R script for AdaBoost
-	rscript = open('adaboost.R','w')
-	print >> rscript, 'library(ada)'
-	print >> rscript, 'tdata <- read.table("trainData.txt")'
-	print >> rscript, 'pdata <- read.table("predictData.txt")'
-	print >> rscript, 'nc <- dim(tdata)[2]'
-	print >> rscript, 'colnames(pdata) <- colnames(tdata[,2:nc])'
-	print >> rscript, 'adamodel <- ada(x=tdata[,2:nc],y=tdata[,1],iter=%s)' % options.iter_num
-	print >> rscript, 'adapred <- predict(adamodel, newdata=pdata,type="probs")'
-	print >> rscript, 'write.table(adapred[,2],"pred",quote=F,row.names=F,col.names=F)'
-	rscript.close()
+	if options.enhancer != 'NA':
+		# Creat R script for AdaBoost
+		rscript = open('adaboost.R','w')
+		print >> rscript, 'library(ada)'
+		print >> rscript, 'tdata <- read.table("trainData.txt")'
+		print >> rscript, 'pdata <- read.table("predictData.txt")'
+		print >> rscript, 'nc <- dim(tdata)[2]'
+		print >> rscript, 'colnames(pdata) <- colnames(tdata[,2:nc])'
+		print >> rscript, 'adamodel <- ada(x=tdata[,2:nc],y=tdata[,1],iter=%s)' % options.iter_num
+		print >> rscript, 'adapred <- predict(adamodel, newdata=pdata,type="probs")'
+		print >> rscript, 'write.table(adapred[,2],"pred",quote=F,row.names=F,col.names=F)'
+		rscript.close()
 
-	print '@ ' + time.ctime(),
-	print 'Model training and predicting.'
-	
-	# Execution of AdaBoost
-	p = subprocess.Popen('Rscript adaboost.R', shell=True)
-	p.wait()
-	
-	# Prediction interpretation and output
-	adapred = open('pred','r')
-	fout = open(options.output,'w')
-	outfileTarget = open(os.path.join(tmp_dir, options.genome+'_target.bed'),'r')
-	for prob in adapred:
-	 	ln = outfileTarget.next().strip()
-	 	prob = float(prob.strip())
-	 	if prob >= options.p_thres:
-	 		print >> fout, ln
-	fout.close()
-	outfileTarget.close()
-	adapred.close()
+		print '@ ' + time.ctime(),
+		print 'Model training and predicting.'
+		
+		# Execution of AdaBoost
+		p = subprocess.Popen('Rscript adaboost.R', shell=True)
+		p.wait()
+		
+		# Prediction interpretation and output
+		adapred = open('pred','r')
+		fout = open(options.output,'w')
+		outfileTarget = open(os.path.join(tmp_dir, options.genome+'_target.bed'),'r')
+		for prob in adapred:
+		 	ln = outfileTarget.next().strip()
+		 	prob = float(prob.strip())
+		 	if prob >= options.p_thres:
+		 		print >> fout, ln
+		fout.close()
+		outfileTarget.close()
+		adapred.close()
 
 if __name__ == '__main__':
 	main()
