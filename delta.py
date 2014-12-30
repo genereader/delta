@@ -6,7 +6,6 @@ import subprocess
 import numpy as np
 from optparse import OptionParser
 from pybedtools import *
-#from lib.features import *
 from lib.process import *
 
 def set_optparser():
@@ -26,7 +25,7 @@ def set_optparser():
 	optparser.add_option('-P','--promoter',dest='promoter',type='string',
 		help='BED file containing the promoter loci',default='NA')
 	optparser.add_option('-B','--background_size',dest='back_size',type='int',
-		help='Number of random genomic regions distal to known TSS (default: 10000)',default=80000)
+		help='Number of random genomic regions distal to known TSS (default: 20000)',default=20000)
 	optparser.add_option('-g','--genome',dest='genome',type='string',
 		help='Genome assembly should be one of the followings: dm3, mm9, hg17, hg18, hg19',default='hg19')
 	optparser.add_option('-b','--bin_size',dest='bin_size',type='int',
@@ -67,13 +66,6 @@ def main():
 		print '@ ' + time.ctime(),
 		print 'Calculating total count of reads in each BED file.'
 		dictChip2Len = {}
-		
-		#CD4
-		#dictChip2Len = {'H2AK5ac.chr1.bed':3426772,'H2AK9ac.chr1.bed':2060786,'H2BK120ac.chr1.bed':3426678,'H2BK12ac.chr1.bed':3600043,'H2BK20ac.chr1.bed':4061778,'H2BK5ac.chr1.bed':3315215,'H2BK5me1.chr1.bed':8868681,'H3K14ac.chr1.bed':3781522,'H3K18ac.chr1.bed':4228555,'H3K23ac.chr1.bed':2518309,'H3K27ac.chr1.bed':3432394,'H3K27me1.chr1.bed':9997998,'H3K27me2.chr1.bed':9027153,'H3K27me3.chr1.bed':8969379,'H3K36ac.chr1.bed':4355864,'H3K36me1.chr1.bed':8033868,'H3K36me3.chr1.bed':13570946,'H3K4ac.chr1.bed':3528870,'H3K4me1.chr1.bed':11320203,'H3K4me2.chr1.bed':5446927,'H3K4me3.chr1.bed':16841728,'H3K79me1.chr1.bed':5110747,'H3K79me2.chr1.bed':4694161,'H3K79me3.chr1.bed':5905785,'H3K9ac.chr1.bed':3950078,'H3K9me1.chr1.bed':9267232,'H3K9me2.chr1.bed':9739255,'H3K9me3.chr1.bed':6309689,'H3R2me1.chr1.bed':9507369,'H3R2me2.chr1.bed':6476651,'H4K12ac.chr1.bed':3662483,'H4K16ac.chr1.bed':7019538,'H4K20me1.chr1.bed':10911168,'H4K20me3.chr1.bed':5561246,'H4K5ac.chr1.bed':4100374,'H4K8ac.chr1.bed':4260895,'H4K91ac.chr1.bed':3169773,'H4R3me2.chr1.bed':7297121}
-		
-		#H1
-		#dictChip2Len = {'H3K4me1.chr1.bed':16910668,'H3K4me2.chr1.bed':25788129,'H3K4me3.chr1.bed':23910645,'H2BK15ac.chr1.bed':26559811,'H3K23me2.chr1.bed':24199260,'H3K27ac.chr1.bed':15590912,'H3K27me3.chr1.bed':11356062,'H3K36me3.chr1.bed':14183808,'H3K4ac.chr1.bed':19562559,'H3K56ac.chr1.bed':20601724,'H3K79me1.chr1.bed':17285256,'H3K79me2.chr1.bed':17327532,'H3K9ac.chr1.bed':13878853,'H3K9me3.chr1.bed':24778009,'H4K20me1.chr1.bed':22569699,'H4K5ac.chr1.bed':25705736,'H4K8ac.chr1.bed':9548724,'H4K91ac.chr1.bed':23370795}
-
 		for chipName in chipNames:
 			chipBed = BedTool(chipName)
 			dictChip2Len[chipName] = len(open(chipName).readlines())
@@ -138,10 +130,9 @@ def main():
 						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureKurt[i])
 						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureSkew[i])
 						trainData[len(enhancerProfileMat)+len(promoterProfileMat)+i].append(shuffledFeatureBimo[i])
-			write_plain_format(trainData, 'trainData'+str(options.win_size)+'.txt')
+			write_plain_format(trainData, 'trainData.txt')
 
 		# Predict data
-
 			# Binning genome
 			print '@ ' + time.ctime(),
 			print "Bining genome."
@@ -157,19 +148,15 @@ def main():
 				print '@ ' + time.ctime(),
 				print 'Calculating counts of ' + chipName
 				hm = chipName.split('/')[-1].split('.')[0]
-				if hm.find('h3k4me1') != -1:
-					hm = 'H3K4me1'
-				elif hm.find('h3k4me2') != -1:
-					hm = 'H3K4me2'
-				elif hm.find('h3k4me3') != -1:
-					hm = 'H3K4me3'
 				countFile = os.path.join(tmp_dir, options.genome+'_'+hm+'_count.bed')
 				if not os.path.exists(countFile):
 					BedTool(binName).window(chipBed,w=0,c=True,output=countFile)
 				print '@ ' + time.ctime(),
 				print 'Profiling sliding windows'
-				featureFile = os.path.join(tmp_dir, options.genome+'_'+hm+'_feature.txt')
+				featureFile = options.genome+'_'+hm+'_feature.txt'
 				profile_sliding_window(countFile, lineCount, win, options.bin_size, featureFile)
+				p = subprocess.Popen("paste -d '\t' *_feature.txt > predictData.txt", shell=True)
+				p.wait()
 
 	if options.enhancer != 'NA':
 		# Creat R script for AdaBoost
