@@ -138,7 +138,6 @@ def main():
 			print "Bining genome."
 			binName = bin_genome(options.genome, options.bin_size, options.win_size, tmp_dir)
 			predictData = []
-			targetPosMat = []
 			for chipName in chipNames:
 				# Line count of ChIP-seq for normalization
 				lineCount = dictChip2Len[chipName]
