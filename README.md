@@ -32,7 +32,7 @@ Please check the file 'INSTALL' in the distribution.
 										Length of dividing bins (default: 100)
 	-w WIN_SIZE, --window_size=WIN_SIZE
 										Length of sliding window, should be integer times of 
-										bin size (default: 4000)
+										bin size (default: 2000)
 	--iteration_number=ITER_NUM
 										Number of iteration for AdaBoost (default: 100)
 	--pvalue_threshold=P_THRES

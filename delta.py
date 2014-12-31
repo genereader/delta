@@ -138,6 +138,7 @@ def main():
 			print "Bining genome."
 			binName = bin_genome(options.genome, options.bin_size, options.win_size, tmp_dir)
 			predictData = []
+			featurefiles = []
 			for chipName in chipNames:
 				# Line count of ChIP-seq for normalization
 				lineCount = dictChip2Len[chipName]
@@ -153,9 +154,11 @@ def main():
 				print '@ ' + time.ctime(),
 				print 'Profiling sliding windows'
 				featureFile = options.genome+'_'+hm+'_feature.txt'
+				featurefiles.append(featureFile)
 				profile_sliding_window(countFile, lineCount, win, options.bin_size, featureFile)
-				p = subprocess.Popen("paste -d '\t' *_feature.txt > predictData.txt", shell=True)
-				p.wait()
+			cmd = "paste -d '\t' %s > predictData.txt" % ' '.join(featurefiles)
+			p = subprocess.Popen(cmd, shell=True)
+			p.wait()
 
 	if options.enhancer != 'NA':
 		# Creat R script for AdaBoost
@@ -166,8 +169,11 @@ def main():
 		print >> rscript, 'nc <- dim(tdata)[2]'
 		print >> rscript, 'colnames(pdata) <- colnames(tdata[,2:nc])'
 		print >> rscript, 'adamodel <- ada(x=tdata[,2:nc],y=tdata[,1],iter=%s)' % options.iter_num
-		print >> rscript, 'adapred <- predict(adamodel, newdata=pdata,type="probs")'
-		print >> rscript, 'write.table(adapred[,2],"pred",quote=F,row.names=F,col.names=F)'
+		print >> rscript, 'adapred.fwd <- predict(adamodel, newdata=pdata,type="probs")'
+		print >> rscript, 'pdata[,seq(4,nc,4)-1] <- -pdata[,seq(4,nc,4)-1]'
+		print >> rscript, 'adapred.bkwd <- predict(adamodel, newdata=pdata,type="probs")'
+		print >> rscript, 'prob.mat <- cbind(adapred.fwd[,2],adapred.bkwd[,2])'
+		print >> rscript, 'write.table(apply(prob.mat,1,min),"pred",quote=F,row.names=F,col.names=F)'
 		rscript.close()
 
 		print '@ ' + time.ctime(),
@@ -178,17 +184,9 @@ def main():
 		p.wait()
 		
 		# Prediction interpretation and output
-		adapred = open('pred','r')
-		fout = open(options.output,'w')
-		outfileTarget = open(os.path.join(tmp_dir, options.genome+'_target.bed'),'r')
-		for prob in adapred:
-		 	ln = outfileTarget.next().strip()
-		 	prob = float(prob.strip())
-		 	if prob >= options.p_thres:
-		 		print >> fout, ln
-		fout.close()
-		outfileTarget.close()
-		adapred.close()
+		cmd = 'peakcalling.py -i pred -j %s -p %f' % (countFile,options.p_thres)
+		p = subprocess.Popen(cmd, shell=True)
+		p.wait()
 
 if __name__ == '__main__':
 	main()

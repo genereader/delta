@@ -141,7 +141,6 @@ def shape(x, win):
 		y = smooth(x)
 		margin = int((len(y)-len(x))/2)
 		x = y[margin:(len(y)-margin)]
-		#h = max(x[(pos-5):(pos+6)])
 		h = x[pos]
 		if x.mean() < 5 or sum(x[0:pos]!=0) <= 5 or sum(x[(pos+1):]!=0) <= 5:
 			kurt = 0
@@ -173,7 +172,6 @@ def shape_mat(profileMat, win):
 		y = smooth(x)
 		margin = int((len(y)-len(x))/2)
 		x = y[margin:(len(y)-margin)]
-		#h = max(x[(pos-5):(pos+6)])
 		h = x[pos]
 		if x.mean() < 5 or sum(x[0:pos]!=0) <= 5 or sum(x[(pos+1):]!=0) <= 5:
 			kurt = 0
@@ -204,7 +202,6 @@ def profile_sliding_window(countBedName, totReadCount, win, binSize, featureFile
 	countBed.close()
 	fpkmVector = np.asarray(fpkmVector)
 	for i in range(0, len(fpkmVector)):
-		#print fpkmVector[(i-win/2):(i+win/2+1)]
 		kurt, skew, bimo, h = shape(fpkmVector[(i-win/2):(i+win/2+1)],win)
 		featureFile.write(str(h)+'\t'+str(kurt)+'\t'+str(skew)+'\t'+str(bimo)+'\n')
 	featureFile.close()
@@ -219,7 +216,6 @@ def profile_sliding_window_binvector(countBedName, totReadCount, win, binSize, f
 		fpkm = float(ln.split()[3])*1000000000/(totReadCount*binSize)
 		fpkmVector.append(fpkm)
 	countBed.close()
-	#fpkmVector = np.asarray(fpkmVector)
 	for i in range(0, len(fpkmVector)):
 		if len(fpkmVector[(i-win/2):(i+win/2+1)]) == win + 1:
 			for fpkm in fpkmVector[(i-win/2):(i+win/2+1)]:
